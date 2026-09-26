@@ -500,7 +500,6 @@ function LoginScreen({ email, setEmail, password, setPassword, accountType, setA
     </div>
   );
 }
-
 // ── Signup (with validation) ──────────────────────────────────────────────────
 function SignupScreen({ signupType, setSignupType, onComplete, onBack }: { signupType: AccountType; setSignupType: (v: AccountType) => void; onComplete: (name: string, email: string, phone: string, type: AccountType) => void; onBack: () => void }) {
   const [vals, setVals] = useState<Record<string, string>>({});
@@ -536,7 +535,6 @@ function SignupScreen({ signupType, setSignupType, onComplete, onBack }: { signu
     </div>
   );
 }
-
 // ── Forgot Password ───────────────────────────────────────────────────────────
 function ForgotPasswordPage({ onBack }: { onBack: () => void }) {
   const [email, setEmail] = useState("");
@@ -792,6 +790,7 @@ function BookingFlow({ provider, accountType, days, selectedDate, setSelectedDat
   const takenTimes = accountType === "personal" ? bookedSlots.filter((s) => s.dateIdx === dayData?.dayIdx).map((s) => s.time) : [];
   if (sent) return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] px-8 text-center">
+
       <motion.div
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -1604,7 +1603,6 @@ function BottomNav({ activeTab, onTab }: { activeTab: "home"|"bookings"|"calenda
     </div>
   );
 }
-
 // ── Account Switcher Sheet ────────────────────────────────────────────────────
 function AccountSwitcherSheet({ accounts, onSwitch, onClose, onAddAccount }: { accounts: Account[]; onSwitch: (id: string) => void; onClose: () => void; onAddAccount: () => void }) {
   return(
