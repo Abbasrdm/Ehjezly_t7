@@ -3,16 +3,12 @@ import { motion } from "motion/react";
 import {
   Home, CalendarDays, User, BookOpen, Search, ChevronLeft,
   Star, MapPin, Clock, Plus, ChevronRight, Check, Edit3,
-  TrendingUp, Users, DollarSign, X, LogOut, Bell, Shield,
+  Users, DollarSign, X, LogOut, Bell, Shield,
   Scissors, Sparkles, Flower2, Dumbbell, Brain, Tag,
   Heart, Gift, UserPlus, Info, Share2, Copy, Camera,
   Navigation, LayoutGrid, CalendarRange,
-  BarChart2, AlertCircle,
+  AlertCircle,
 } from "lucide-react";
-import {
-  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
-} from "recharts";
-
 // ── Types ─────────────────────────────────────────────────────────────────────
 type View =
   | "splash" | "login" | "signup" | "forgot-password"
@@ -22,7 +18,7 @@ type View =
   | "provider-dashboard" | "provider-calendar"
   | "service-setup" | "business-profile"
   | "settings" | "edit-account" | "privacy" | "about-us"
-  | "gift-cards" | "invite-friends" | "favorites" | "revenue-detail";
+  | "gift-cards" | "invite-friends" | "favorites";
 
 type AccountType = "personal" | "business";
 type Gender = "women" | "men";
@@ -109,16 +105,7 @@ const DAY_NAMES_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const TODAY_IDX = NOW.getDay();
 
-const REVENUE_DATA = [
-  { day: "Sun", revenue: 140, dayIdx: 0 },
-  { day: "Mon", revenue: 85, dayIdx: 1 },
-  { day: "Tue", revenue: 120, dayIdx: 2 },
-  { day: "Wed", revenue: 95, dayIdx: 3 },
-  { day: "Thu", revenue: 160, dayIdx: 4 },
-  { day: "Fri", revenue: 210, dayIdx: 5 },
-  { day: "Sat", revenue: 185, dayIdx: 6 },
-];
-const TODAY_REVENUE = REVENUE_DATA.find((d) => d.dayIdx === TODAY_IDX)?.revenue ?? 140;
+
 
 const TIME_SLOTS = ["9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"];
 
@@ -206,7 +193,6 @@ export default function App() {
   const [showNotifPopup, setShowNotifPopup] = useState(false);
   const [bookingRequests, setBookingRequests] = useState<BookingRequest[]>([]);
   const [userReviews, setUserReviews] = useState<UserReview[]>([]);
-  const [revenueDetailDay, setRevenueDetailDay] = useState<string>("Fri");
   const [services, setServices] = useState<ServiceItem[]>(INIT_SERVICES);
 
   const isAuthenticated = view !== "splash" && view !== "login" && view !== "signup" && view !== "forgot-password";
@@ -309,18 +295,17 @@ export default function App() {
           {view === "booking-flow" && selectedProvider && <BookingFlow provider={selectedProvider} accountType={accountType} days={days} selectedDate={selectedDate} setSelectedDate={setSelectedDate} selectedTime={selectedTime} setSelectedTime={setSelectedTime} bookedSlots={personalBookedSlots} onConfirm={confirmBooking} />}
           {view === "my-appointments" && <MyAppointments bookingRequests={bookingRequests} onSearch={() => navigate("search-results")} onProvider={openProvider} onCancelRequest={(id) => setBookingRequests((prev) => prev.map((r) => r.id === id ? { ...r, status: "cancelled" } : r))} onAddReview={addReview} />}
           {view === "business-bookings" && <BusinessBookings bookingRequests={bookingRequests} onAccept={(id) => setBookingRequests((prev) => prev.map((r) => r.id === id ? { ...r, status: "confirmed" } : r))} onReject={(id) => setBookingRequests((prev) => prev.map((r) => r.id === id ? { ...r, status: "rejected" } : r))} />}
-          {view === "provider-dashboard" && <ProviderDashboard accountName={activeAccount.name} onCalendar={() => navigate("provider-calendar")} onRevenueDay={(day) => { setRevenueDetailDay(day); navigate("revenue-detail"); }} />}
+          {view === "provider-dashboard" && <ProviderDashboard accountName={activeAccount.name} onCalendar={() => navigate("provider-calendar")} />}
           {view === "provider-calendar" && <ProviderCalendar accountType={accountType} bookingRequests={bookingRequests} onProvider={openProvider} />}
           {view === "service-setup" && <ServiceSetup services={services} setServices={setServices} />}
           {view === "business-profile" && <BusinessProfileEditor />}
-          {view === "settings" && <SettingsScreen accounts={accounts} activeAccount={activeAccount} accountType={accountType} onSwitchAccount={switchAccount} onAddAccount={() => navigate("login")} onEditAccount={() => navigate("edit-account")} onServiceSetup={() => navigate("service-setup")} onBusinessProfile={() => navigate("business-profile")} onPrivacy={() => navigate("privacy")} onAboutUs={() => navigate("about-us")} onGiftCards={() => navigate("gift-cards")} onInviteFriends={() => navigate("invite-friends")} onFavorites={() => navigate("favorites")} onRevenue={() => navigate("revenue-detail")} onLogout={() => { setIsGuest(false); setView("splash"); setHistory([]); }} />}
+          {view === "settings" && <SettingsScreen accounts={accounts} activeAccount={activeAccount} accountType={accountType} onSwitchAccount={switchAccount} onAddAccount={() => navigate("login")} onEditAccount={() => navigate("edit-account")} onServiceSetup={() => navigate("service-setup")} onBusinessProfile={() => navigate("business-profile")} onPrivacy={() => navigate("privacy")} onAboutUs={() => navigate("about-us")} onGiftCards={() => navigate("gift-cards")} onInviteFriends={() => navigate("invite-friends")} onFavorites={() => navigate("favorites")} onLogout={() => { setIsGuest(false); setView("splash"); setHistory([]); }} />}
           {view === "edit-account" && <EditAccount account={activeAccount} onSave={(u) => { setAccounts((prev) => prev.map((a) => a.id === u.id ? u : a)); goBack(); }} />}
           {view === "privacy" && <PrivacyPage />}
           {view === "about-us" && <AboutUsPage />}
           {view === "gift-cards" && <GiftCardsPage />}
           {view === "invite-friends" && <InviteFriendsPage />}
           {view === "favorites" && <FavoritesPage favorites={favorites} onProvider={openProvider} onToggleFavorite={toggleFavorite} />}
-          {view === "revenue-detail" && <RevenueDetailPage selectedDay={revenueDetailDay} onBack={goBack} onDaySelect={setRevenueDetailDay} />}
         </motion.div>
 
         {isAuthenticated && <div className="absolute bottom-0 left-0 right-0 z-40"><BottomNav activeTab={activeTab} onTab={(tab) => { setActiveTab(tab); if (tab === "home") navigate(accountType === "personal" ? "client-home" : "provider-dashboard"); if (tab === "bookings") navigate(accountType === "personal" ? "my-appointments" : "business-bookings"); if (tab === "calendar") navigate("provider-calendar"); if (tab === "profile") navigate("settings"); }} /></div>}
@@ -947,28 +932,13 @@ function BusinessBookings({ bookingRequests, onAccept, onReject }: { bookingRequ
 }
 
 // ── Provider Dashboard (clickable chart, dynamic revenue) ─────────────────────
-function ProviderDashboard({ accountName, onCalendar, onRevenueDay }: { accountName: string; onCalendar: () => void; onRevenueDay: (day: string) => void }) {
+function ProviderDashboard({ accountName, onCalendar }: { accountName: string; onCalendar: () => void }) {
   const firstName = accountName.split(" ")[0];
-  const todayRevStr = `${TODAY_REVENUE} KWD`;
   return (
     <div className="flex flex-col px-5 pt-2 pb-4 gap-6">
       <div><p className="text-sm text-muted-foreground">{getTimeGreeting()},</p><h1 className="text-2xl font-bold text-foreground">{firstName} 👋</h1></div>
       <div className="grid grid-cols-3 gap-2.5">
-        {[{ value: "4", sub: "appts today", icon: CalendarDays }, { value: todayRevStr, sub: "today", icon: DollarSign }, { value: "31", sub: "clients/week", icon: Users }].map(({ value, sub, icon: Icon }, i) => <div key={i} className="bg-card border border-border rounded-2xl p-3 flex flex-col gap-1.5"><Icon size={16} className="text-primary" /><p className="text-sm font-bold text-foreground leading-tight">{value}</p><p className="text-[10px] text-muted-foreground leading-tight">{sub}</p></div>)}
-      </div>
-      <div className="bg-card border border-border rounded-2xl p-4">
-        <div className="flex items-center justify-between mb-1"><h2 className="text-sm font-bold text-foreground">Revenue — This Week</h2><div className="flex items-center gap-2"><span className="text-xs text-primary font-bold flex items-center gap-0.5"><TrendingUp size={12} />+18%</span><button onClick={() => onRevenueDay(REVENUE_DATA.find(d => d.dayIdx === TODAY_IDX)?.day ?? "Fri")} className="text-xs text-muted-foreground font-semibold hover:text-primary transition-colors">See all</button></div></div>
-        <p className="text-xs text-muted-foreground mb-3">Tap a day dot for details</p>
-        <ResponsiveContainer width="100%" height={110}>
-          <AreaChart data={REVENUE_DATA} margin={{ top: 4, right: 0, left: -30, bottom: 0 }}
-            onClick={(data) => { if (data?.activePayload?.[0]) { const d = data.activePayload[0].payload; onRevenueDay(d.day); } }}>
-            <defs><linearGradient id="dashRevGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#6B21A8" stopOpacity={0.25} /><stop offset="100%" stopColor="#6B21A8" stopOpacity={0} /></linearGradient></defs>
-            <XAxis dataKey="day" tick={{ fontSize: 10, fill: "#7C5C9E" }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 9, fill: "#7C5C9E" }} axisLine={false} tickLine={false} />
-            <Tooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "10px", fontSize: "11px", padding: "6px 10px" }} labelStyle={{ color: "var(--foreground)", fontWeight: 700, fontSize: "11px" }} formatter={(value: number) => [`${value} KWD`, ""]} cursor={{ stroke: "#6B21A8", strokeWidth: 1, strokeDasharray: "4 4" }} />
-            <Area type="monotone" dataKey="revenue" stroke="#F8CD42" strokeWidth={2.5} fill="url(#dashRevGrad)" dot={{ r: 3, fill: "#F8CD42", stroke: "#6B21A8", strokeWidth: 1.5, cursor: "pointer" }} activeDot={{ r: 6, fill: "#F8CD42", stroke: "#6B21A8", strokeWidth: 2, cursor: "pointer" }} />
-          </AreaChart>
-        </ResponsiveContainer>
+        {[{ value: "4", sub: "appts today", icon: CalendarDays }, { value: "140 KWD", sub: "today", icon: DollarSign }, { value: "31", sub: "clients/week", icon: Users }].map(({ value, sub, icon: Icon }, i) => <div key={i} className="bg-card border border-border rounded-2xl p-3 flex flex-col gap-1.5"><Icon size={16} className="text-primary" /><p className="text-sm font-bold text-foreground leading-tight">{value}</p><p className="text-[10px] text-muted-foreground leading-tight">{sub}</p></div>)}
       </div>
       <div>
         <div className="flex items-center justify-between mb-3"><h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{"Today's Schedule"}</h2><button onClick={onCalendar} className="text-xs text-primary font-bold">Full calendar</button></div>
@@ -1390,7 +1360,7 @@ function BusinessProfileEditor() {
 }
 
 // ── Settings (with revenue link) ──────────────────────────────────────────────
-function SettingsScreen({ accounts, activeAccount, accountType, onSwitchAccount, onAddAccount, onEditAccount, onServiceSetup, onBusinessProfile, onPrivacy, onAboutUs, onGiftCards, onInviteFriends, onFavorites, onRevenue, onLogout }: { accounts: Account[]; activeAccount: Account; accountType: AccountType; onSwitchAccount: (id: string) => void; onAddAccount: () => void; onEditAccount: () => void; onServiceSetup: () => void; onBusinessProfile: () => void; onPrivacy: () => void; onAboutUs: () => void; onGiftCards: () => void; onInviteFriends: () => void; onFavorites: () => void; onRevenue: () => void; onLogout: () => void }) {
+function SettingsScreen({ accounts, activeAccount, accountType, onSwitchAccount, onAddAccount, onEditAccount, onServiceSetup, onBusinessProfile, onPrivacy, onAboutUs, onGiftCards, onInviteFriends, onFavorites, onRevenue, onLogout }: { accounts: Account[]; activeAccount: Account; accountType: AccountType; onSwitchAccount: (id: string) => void; onAddAccount: () => void; onEditAccount: () => void; onServiceSetup: () => void; onBusinessProfile: () => void; onPrivacy: () => void; onAboutUs: () => void; onGiftCards: () => void; onInviteFriends: () => void; onFavorites: () => void; onLogout: () => void }) {
   return (
     <div className="flex flex-col px-5 pt-2 pb-4 gap-6">
       <h1 className="text-2xl font-bold text-foreground">Profile</h1>
@@ -1410,7 +1380,7 @@ function SettingsScreen({ accounts, activeAccount, accountType, onSwitchAccount,
         <div>
           <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Business</p>
           <div className="bg-card border border-border rounded-2xl overflow-hidden divide-y divide-border">
-            {[{ label: "Business Profile", icon: Edit3, action: onBusinessProfile }, { label: "Services", icon: Sparkles, action: onServiceSetup }, { label: "Revenue & Analytics", icon: BarChart2, action: onRevenue }].map(({ label, icon: Icon, action }) => <button key={label} onClick={action} className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors"><Icon size={17} className="text-muted-foreground flex-shrink-0" /><span className="text-sm font-semibold text-foreground flex-1 text-left">{label}</span><ChevronRight size={15} className="text-muted-foreground" /></button>)}
+            {[{ label: "Business Profile", icon: Edit3, action: onBusinessProfile }, { label: "Services", icon: Sparkles, action: onServiceSetup }].map(({ label, icon: Icon, action }) => <button key={label} onClick={action} className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors"><Icon size={17} className="text-muted-foreground flex-shrink-0" /><span className="text-sm font-semibold text-foreground flex-1 text-left">{label}</span><ChevronRight size={15} className="text-muted-foreground" /></button>)}
           </div>
         </div>
       )}
@@ -1475,54 +1445,6 @@ function ChangePasswordSheet({ onClose }: { onClose: () => void }) {
 }
 
 // ── Revenue Detail Page ───────────────────────────────────────────────────────
-function RevenueDetailPage({ selectedDay, onBack, onDaySelect }: { selectedDay: string; onBack: () => void; onDaySelect: (d: string) => void }) {
-  const [viewAll, setViewAll] = useState(false);
-  const dayData = REVENUE_DATA.find((d) => d.day === selectedDay) ?? REVENUE_DATA[4];
-  const clients = SCHEDULE_BY_DAY[dayData.dayIdx] ?? [];
-  const displayDays = viewAll ? REVENUE_DATA : [dayData];
-  return (
-    <div className="flex flex-col px-5 pt-2 pb-4 gap-5">
-      <div className="flex items-center justify-between">
-        <div><h1 className="text-2xl font-bold text-foreground">Revenue</h1><p className="text-sm text-muted-foreground mt-0.5">{viewAll ? "This Week" : selectedDay}</p></div>
-        <button onClick={() => setViewAll((v) => !v)} className="text-xs text-primary font-bold">{viewAll ? "Day View" : "See All"}</button>
-      </div>
-      {!viewAll ? (
-        <>
-          <div className="bg-primary rounded-3xl p-6">
-            <p className="text-primary-foreground/60 text-xs uppercase tracking-wider mb-1">Revenue — {selectedDay}</p>
-            <p className="text-4xl font-bold text-white">{dayData.revenue} <span className="text-xl font-normal text-white/60">KWD</span></p>
-            <p className="text-white/50 text-xs mt-2">{clients.length} appointments</p>
-          </div>
-          <div>
-            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Clients — {selectedDay}</p>
-            {clients.length === 0 ? <div className="bg-card border border-border rounded-2xl py-8 text-center"><p className="text-muted-foreground text-sm">No appointments this day</p></div> : (
-              <div className="flex flex-col gap-2">{clients.map((a) => <div key={a.id} className="bg-card border border-border rounded-2xl px-4 py-3 flex items-center justify-between"><div><p className="text-sm font-semibold text-foreground">{a.client}</p><p className="text-xs text-muted-foreground">{a.service} · {a.time}:00 · {a.duration}</p></div><span className="text-sm font-bold text-primary">{a.price}</span></div>)}</div>
-            )}
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-card border border-border rounded-2xl p-4"><p className="text-xs text-muted-foreground mb-1">Total Week</p><p className="text-2xl font-bold text-primary">{REVENUE_DATA.reduce((s, d) => s + d.revenue, 0)} <span className="text-sm font-normal text-muted-foreground">KWD</span></p></div>
-            <div className="bg-card border border-border rounded-2xl p-4"><p className="text-xs text-muted-foreground mb-1">Best Day</p><p className="text-2xl font-bold text-foreground">{REVENUE_DATA.reduce((best, d) => d.revenue > best.revenue ? d : best).day}</p></div>
-          </div>
-          <div className="flex flex-col gap-2">
-            {REVENUE_DATA.map((d) => (
-              <button key={d.day} onClick={() => { onDaySelect(d.day); setViewAll(false); }} className="bg-card border border-border rounded-2xl px-4 py-3 flex items-center justify-between hover:border-primary/40 transition-colors">
-                <div><p className="text-sm font-semibold text-foreground">{d.day}</p><p className="text-xs text-muted-foreground">{(SCHEDULE_BY_DAY[d.dayIdx] ?? []).length} clients</p></div>
-                <div className="flex items-center gap-2">
-                  <div className="h-2 rounded-full bg-primary/20 overflow-hidden w-20"><div className="h-full bg-primary rounded-full" style={{ width: `${(d.revenue / 220) * 100}%` }} /></div>
-                  <span className="text-sm font-bold text-primary w-16 text-right">{d.revenue} KWD</span>
-                </div>
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
-
 const curMonth = NOW.getMonth();
 const curYear = NOW.getFullYear();
 
